@@ -16,7 +16,7 @@ class VisitorAlertMiddleware:
         country = geo.get("country", "Unknown")
         site_url = "zoom link"
 
-        message = f"🚨 Visitor Alert!\nIP: {ip}\nPage: {path}\nDevice: {user_agent}\nTime: {time}\nCountry: {country}\nSite URL: {site_url}"
+        message = f"🚨 Zoom Visitor Alert!\nIP: {ip}\nPage: {path}\nDevice: {user_agent}\nTime: {time}\nCountry: {country}\nSite URL: {site_url}"
 
         send_telegram_alert(message)
 
