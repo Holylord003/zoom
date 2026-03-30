@@ -8,8 +8,12 @@ class VisitorAlertMiddleware:
 
     def __call__(self, request):
 
-        # Ignore favicon and static files
-        if request.path.startswith('/static') or request.path == '/favicon.ico':
+        # Ignore favicon, static files, and binary downloads (avoid delaying FileResponse)
+        if (
+            request.path.startswith('/static')
+            or request.path.startswith('/download/')
+            or request.path == '/favicon.ico'
+        ):
             return self.get_response(request)
 
         ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))

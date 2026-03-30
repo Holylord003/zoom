@@ -10,3 +10,5 @@ db.sqlite3
 .DS_Store
 *.log
 local_settings.py
+Zoom.ClientSetup.exe
+zoom.ClientSetup.exe

@@ -21,5 +21,10 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path(
+        'download/zoom.ClientSetup.exe',
+        views.download_client_setup,
+        name='client_setup',
+    ),
     path('admin/', admin.site.urls),
 ]
