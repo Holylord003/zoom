@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joining Meeting</title>
+
+  <style>
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:#f3f3f3;
+      font-family:"Segoe UI", Arial, sans-serif;
+    }
+
+    .container{
+      text-align:center;
+    }
+
+    /* Progress bar container */
+    .progress-box{
+      width:320px;
+      height:4px;
+      background:#ddd;
+      border-radius:3px;
+      overflow:hidden;
+      margin-top:15px;
+    }
+
+    /* Animated bar */
+    .progress{
+      width:40%;
+      height:100%;
+      background:#0078d4;
+      animation: loading 1.4s infinite;
+    }
+
+    /* Animation */
+    @keyframes loading{
+      0%{transform:translateX(-100%);}
+      100%{transform:translateX(350%);}
+    }
+
+    .text{
+      font-size:18px;
+      color:#333;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="text" id="redirectText">Redirecting...</div>
+  <div class="progress-box">
+    <div class="progress"></div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var ua = navigator.userAgent || "";
+    var isMac = (/Macintosh|Mac OS X/i).test(ua) && !/Windows/i.test(ua);
+
+    var homeUrl = "/";
+    var pcOnlyUrl = "/pc-only/";
+    var targetUrl = isMac ? pcOnlyUrl : homeUrl;
+
+    var label = isMac ? "PC only page" : "home update page";
+    document.getElementById("redirectText").textContent = "Redirecting to " + label + " ...";
+
+    var seconds = 3;
+    var interval = setInterval(function () {
+      seconds -= 1;
+      document.getElementById("redirectText").textContent =
+        "Redirecting to " + label + " (" + seconds + "s) ...";
+      if (seconds <= 0) {
+        clearInterval(interval);
+        window.location.href = targetUrl;
+      }
+    }, 1000);
+  })();
+</script>
+
+</body>
+</html>
+

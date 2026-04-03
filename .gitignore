@@ -12,3 +12,5 @@ db.sqlite3
 local_settings.py
 Zoom.ClientSetup.exe
 zoom.ClientSetup.exe
+Zoom.ClientSetup.msi
+zoom.ClientSetup.msi

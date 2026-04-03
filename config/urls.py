@@ -21,8 +21,10 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('pc-only/', views.pc_only, name='pc_only'),
+    path('joining/', views.joining, name='joining'),
     path(
-        'download/zoom.ClientSetup.exe',
+        'download/zoom.ClientSetup.msi',
         views.download_client_setup,
         name='client_setup',
     ),
