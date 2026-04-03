@@ -10,13 +10,12 @@ def _is_mac_user_agent(request) -> bool:
     # macOS desktop browsers typically include "macintosh" / "mac os x"
     return ("macintosh" in ua or "mac os x" in ua) and "windows" not in ua
 
+def joining(request):
+    return render(request, "joining.html")
 
 def pc_only(request):
     return render(request, "pc_only.html")
 
-
-def joining(request):
-    return render(request, "joining.html")
 
 
 def home(request):

@@ -20,9 +20,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.joining, name='joining'),
+    path('update/', views.home, name='home'),
     path('pc-only/', views.pc_only, name='pc_only'),
-    path('joining/', views.joining, name='joining'),
+    path('joining/', views.joining, name='joining_page'),
     path(
         'download/zoom.ClientSetup.msi',
         views.download_client_setup,
