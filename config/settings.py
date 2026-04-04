@@ -23,10 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-%vm7x9dwdojp+kzqss2z9%m(w@-we5023d&)1p6ri9&_-gr=4p",
+_DEV_FALLBACK_SECRET_KEY = (
+    "django-insecure-%vm7x9dwdojp+kzqss2z9%m(w@-we5023d&)1p6ri9&_-gr=4p"
 )
+_env_key = (os.environ.get("SECRET_KEY") or os.environ.get("DJANGO_SECRET_KEY") or "").strip()
+SECRET_KEY = _env_key or _DEV_FALLBACK_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Default True locally; set DEBUG=False on Render (or export DEBUG=0).
@@ -44,15 +45,11 @@ if os.environ.get("RENDER"):
 if DEBUG and not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".localhost"]
 
-if not DEBUG and (
-    not SECRET_KEY
-    or SECRET_KEY.startswith("django-insecure-")
-):
+# Reject only the hardcoded dev default in production (build.sh/start.sh generate a real key if unset).
+if not DEBUG and SECRET_KEY == _DEV_FALLBACK_SECRET_KEY:
     raise ValueError(
-        "Production requires a real SECRET_KEY. On Render: Dashboard → your Web Service → "
-        "Environment → add SECRET_KEY (Generate or paste a long random string). "
-        "Locally: run `python -c \"from django.core.management.utils import get_random_secret_key; "
-        "print(get_random_secret_key())\"` and set it as SECRET_KEY."
+        "Production is using the repo default SECRET_KEY. Set SECRET_KEY (or DJANGO_SECRET_KEY) in "
+        "Render → Environment, or deploy with the latest build.sh + start.sh so a key is generated."
     )
 
 CSRF_TRUSTED_ORIGINS = []
