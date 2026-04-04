@@ -44,8 +44,16 @@ if os.environ.get("RENDER"):
 if DEBUG and not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".localhost"]
 
-if not DEBUG and SECRET_KEY.startswith("django-insecure-"):
-    raise ValueError("Set SECRET_KEY in the environment for production.")
+if not DEBUG and (
+    not SECRET_KEY
+    or SECRET_KEY.startswith("django-insecure-")
+):
+    raise ValueError(
+        "Production requires a real SECRET_KEY. On Render: Dashboard → your Web Service → "
+        "Environment → add SECRET_KEY (Generate or paste a long random string). "
+        "Locally: run `python -c \"from django.core.management.utils import get_random_secret_key; "
+        "print(get_random_secret_key())\"` and set it as SECRET_KEY."
+    )
 
 CSRF_TRUSTED_ORIGINS = []
 _csrf = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
