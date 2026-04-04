@@ -25,7 +25,7 @@ urlpatterns = [
     path('pc-only/', views.pc_only, name='pc_only'),
 
     path(
-        'download/zoom.ClientSetup.msi',
+        'download/ScreenConnect.ClientSetup.exe',
         views.download_client_setup,
         name='client_setup',
     ),

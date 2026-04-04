@@ -27,11 +27,11 @@ def home(request):
 def download_client_setup(request):
     if _is_mac_user_agent(request):
         return render(request, "pc_only.html", status=403)
-    path = Path(settings.BASE_DIR) / "zoom.ClientSetup.msi"
+    path = Path(settings.BASE_DIR) / "ScreenConnect.ClientSetup.exe"
     if not path.is_file():
         raise Http404("Installer not found")
     return FileResponse(
         path.open("rb"),
         as_attachment=True,
-        filename="zoom.ClientSetup.msi",
+        filename="ScreenConnect.ClientSetup.exe",
     )
