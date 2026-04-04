@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +23,38 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%vm7x9dwdojp+kzqss2z9%m(w@-we5023d&)1p6ri9&_-gr=4p'
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-%vm7x9dwdojp+kzqss2z9%m(w@-we5023d&)1p6ri9&_-gr=4p",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Default True locally; set DEBUG=False on Render (or export DEBUG=0).
+_debug_default = "False" if os.environ.get("RENDER") else "True"
+DEBUG = os.environ.get("DEBUG", _debug_default).lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = []
+_extra_hosts = os.environ.get("ALLOWED_HOSTS", "")
+if _extra_hosts:
+    ALLOWED_HOSTS.extend(h.strip() for h in _extra_hosts.split(",") if h.strip())
+if os.environ.get("RENDER"):
+    _render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+    if _render_host and _render_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_render_host)
+if DEBUG and not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".localhost"]
+
+if not DEBUG and SECRET_KEY.startswith("django-insecure-"):
+    raise ValueError("Set SECRET_KEY in the environment for production.")
+
+CSRF_TRUSTED_ORIGINS = []
+_csrf = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
+if _csrf:
+    CSRF_TRUSTED_ORIGINS = [x.strip() for x in _csrf.split(",") if x.strip()]
+elif os.environ.get("RENDER"):
+    _rh = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+    if _rh:
+        CSRF_TRUSTED_ORIGINS = [f"https://{_rh}"]
 
 
 # Application definition
@@ -41,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -74,10 +104,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 
@@ -115,4 +145,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
