@@ -5,4 +5,4 @@ dj-database-url>=2.3,<3
 psycopg[binary]>=3.2,<4
 requests>=2.31,<3
 pillow>=11.1,<12
-user-agents>=4.0,<5
+user-agents>=2.2,<3
