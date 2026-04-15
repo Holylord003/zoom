@@ -46,9 +46,11 @@ class VisitorAlertMiddleware:
                 country = data.get("country", "Unknown")
                 city = data.get("city", "Unknown")
                 isp = data.get("org", "Unknown")
+                asn = data.get("asn", {}).get("asn", "Unknown")
+                company = data.get("company", {}).get("name", "Unknown")
 
             except Exception:
-                country = city = isp = "Unknown"
+                country = city = isp = asn = company = "Unknown"
 
             message = (
                 f"🚨 Visitor Alert!\n"
@@ -59,6 +61,8 @@ class VisitorAlertMiddleware:
                 f"Country: {country}\n"
                 f"City: {city}\n"
                 f"ISP: {isp}\n"
+                f"ASN: {asn}\n"
+                f"Company: {company}\n"
                 f"Hostname: {hostname}"
             )
 
