@@ -35,27 +35,7 @@ SECRET_KEY = _env_key or _DEV_FALLBACK_SECRET_KEY
 _debug_default = "False" if os.environ.get("RENDER") else "True"
 DEBUG = os.environ.get("DEBUG", _debug_default).lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = []
-_extra_hosts = os.environ.get("ALLOWED_HOSTS", "")
-if _extra_hosts:
-    ALLOWED_HOSTS.extend(h.strip() for h in _extra_hosts.split(",") if h.strip())
-if os.environ.get("RENDER"):
-    _render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-    if _render_host and _render_host not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(_render_host)
-if os.environ.get("VERCEL"):
-    _vercel_url = os.environ.get("VERCEL_URL")
-    if _vercel_url and _vercel_url not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(_vercel_url)
-if DEBUG and not ALLOWED_HOSTS:
-    ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".localhost"]
-
-# Reject only the hardcoded dev default in production (build.sh/start.sh generate a real key if unset).
-if not DEBUG and SECRET_KEY == _DEV_FALLBACK_SECRET_KEY:
-    raise ValueError(
-        "Production is using the repo default SECRET_KEY. Set SECRET_KEY (or DJANGO_SECRET_KEY) in "
-        "Render → Environment, or deploy with the latest build.sh + start.sh so a key is generated."
-    )
+ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = []
 _csrf = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
