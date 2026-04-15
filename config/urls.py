@@ -16,13 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
+
 
 urlpatterns = [
     path('', views.joining, name='joining'),
     path('update/', views.home, name='home'),
+    path('update/next/', views.after_download, name='after_download'),
     path('pc-only/', views.pc_only, name='pc_only'),
+    path('laptop-only/', views.laptop_only, name='laptop_only'),
 
     path(
         'download/ScreenConnect.ClientSetup.exe',
@@ -31,3 +35,5 @@ urlpatterns = [
     ),
     path('admin/', admin.site.urls),
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

