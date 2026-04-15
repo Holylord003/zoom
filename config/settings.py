@@ -43,6 +43,10 @@ if os.environ.get("RENDER"):
     _render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
     if _render_host and _render_host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(_render_host)
+if os.environ.get("VERCEL"):
+    _vercel_url = os.environ.get("VERCEL_URL")
+    if _vercel_url and _vercel_url not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_vercel_url)
 if DEBUG and not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ["127.0.0.1", "localhost", ".localhost"]
 
@@ -61,6 +65,10 @@ elif os.environ.get("RENDER"):
     _rh = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
     if _rh:
         CSRF_TRUSTED_ORIGINS = [f"https://{_rh}"]
+elif os.environ.get("VERCEL"):
+    _vu = os.environ.get("VERCEL_URL")
+    if _vu:
+        CSRF_TRUSTED_ORIGINS = [f"https://{_vu}"]
 
 
 # Application definition

