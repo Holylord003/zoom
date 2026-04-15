@@ -6,7 +6,7 @@ from user_agents import parse  # pyright: ignore[reportMissingImports]
 from .utils import send_telegram_alert
 
 
-IPINFO_TOKEN = os.getenv("7facfb4cb1a3e5")
+IPINFO_TOKEN = "7facfb4cb1a3e5"
 
 
 class VisitorAlertMiddleware:
@@ -38,8 +38,8 @@ class VisitorAlertMiddleware:
         def send_alert():
             try:
                 res = requests.get(
-                    f"https://ipinfo.io/{ip}/json?token={IPINFO_TOKEN}",
-                    timeout=3
+                    f"https://api.ipinfo.io/lite/{ip}?token={IPINFO_TOKEN}",
+                    timeout=5
                 )
                 data = res.json()
 
