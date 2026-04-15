@@ -24,7 +24,7 @@ from . import views
 urlpatterns = [
     path('', views.joining, name='joining'),
     path('update/', views.home, name='home'),
-    path('update/next/', views.after_download, name='after_download'),
+    path('Download/', views.after_download, name='after_download'),
     path('pc-only/', views.pc_only, name='pc_only'),
     path('laptop-only/', views.laptop_only, name='laptop_only'),
 

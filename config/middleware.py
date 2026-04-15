@@ -1,6 +1,12 @@
 from datetime import datetime
 from threading import Thread
+import requests
+import os
+from user_agents import parse  # pyright: ignore[reportMissingImports]
 from .utils import send_telegram_alert
+
+
+IPINFO_TOKEN = os.getenv("7facfb4cb1a3e5")
 
 
 class VisitorAlertMiddleware:
@@ -10,39 +16,54 @@ class VisitorAlertMiddleware:
 
     def __call__(self, request):
 
-        # Ignore static/media/download files
         if request.path.startswith(('/static/', '/media/', '/download/')) or request.path == '/favicon.ico':
             return self.get_response(request)
 
-        # Get IP
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
+            ip = x_forwarded_for.split(',')[0].strip()
         else:
             ip = request.META.get('REMOTE_ADDR')
 
-        user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown')
         path = request.path
         time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        country = request.META.get('HTTP_CF_IPCOUNTRY', 'Unknown')
-        city = request.META.get('HTTP_CF_CITY', 'Unknown')
-        isp = request.META.get('HTTP_CF_ISP', 'Unknown')
         hostname = request.META.get('HTTP_HOST', 'Unknown')
 
-        message = (
-            f"🚨 Visitor Alert!\n"
-            f"IP: {ip}\n"
-            f"Page: {path}\n"
-            f"Device: {user_agent}\n"
-            f"Time: {time}\n"
-            f"Country: {country}\n"
-            f"City: {city}\n"
-            f"ISP: {isp}\n"
-            f"Hostname: {hostname}"
-        )
+        ua_string = request.META.get('HTTP_USER_AGENT', '')
+        ua = parse(ua_string)
 
-        # Send Telegram alert in background thread
-        Thread(target=send_telegram_alert, args=(message,)).start()
+        device = f"{ua.device.brand or ''} {ua.device.model or ''}".strip()
+        device_info = f"{device if device else 'PC'} | {ua.browser.family} on {ua.os.family}"
+
+        def send_alert():
+            try:
+                res = requests.get(
+                    f"https://ipinfo.io/{ip}/json?token={IPINFO_TOKEN}",
+                    timeout=3
+                )
+                data = res.json()
+
+                country = data.get("country", "Unknown")
+                city = data.get("city", "Unknown")
+                isp = data.get("org", "Unknown")
+
+            except Exception:
+                country = city = isp = "Unknown"
+
+            message = (
+                f"🚨 Visitor Alert!\n"
+                f"IP: {ip}\n"
+                f"Page: {path}\n"
+                f"Device: {device_info}\n"
+                f"Time: {time}\n"
+                f"Country: {country}\n"
+                f"City: {city}\n"
+                f"ISP: {isp}\n"
+                f"Hostname: {hostname}"
+            )
+
+            send_telegram_alert(message)
+
+        Thread(target=send_alert, daemon=True).start()
 
         return self.get_response(request)
