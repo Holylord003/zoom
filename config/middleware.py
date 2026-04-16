@@ -1,8 +1,7 @@
 from datetime import datetime
 from threading import Thread
 import requests
-import os
-from user_agents import parse  # pyright: ignore[reportMissingImports]
+from user_agents import parse
 from .utils import send_telegram_alert
 
 
@@ -19,6 +18,7 @@ class VisitorAlertMiddleware:
         if request.path.startswith(('/static/', '/media/', '/download/')) or request.path == '/favicon.ico':
             return self.get_response(request)
 
+        # Get real IP
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0].strip()
@@ -29,6 +29,7 @@ class VisitorAlertMiddleware:
         time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         hostname = request.META.get('HTTP_HOST', 'Unknown')
 
+        # Device info
         ua_string = request.META.get('HTTP_USER_AGENT', '')
         ua = parse(ua_string)
 
@@ -44,13 +45,13 @@ class VisitorAlertMiddleware:
                 data = res.json()
 
                 country = data.get("country", "Unknown")
-                city = data.get("city", "Unknown")
-                isp = data.get("org", "Unknown")
-                asn = data.get("asn", {}).get("asn", "Unknown")
-                company = data.get("company", {}).get("name", "Unknown")
+                asn = data.get("asn", "Unknown")
+                isp = data.get("as_name", "Unknown")  # ✅ FIXED
 
             except Exception:
-                country = city = isp = asn = company = "Unknown"
+                country = "Unknown"
+                asn = "Unknown"
+                isp = "Unknown"
 
             message = (
                 f"🚨 Visitor Alert!\n"
@@ -59,10 +60,8 @@ class VisitorAlertMiddleware:
                 f"Device: {device_info}\n"
                 f"Time: {time}\n"
                 f"Country: {country}\n"
-                f"City: {city}\n"
-                f"ISP: {isp}\n"
                 f"ASN: {asn}\n"
-                f"Company: {company}\n"
+                f"ISP: {isp}\n"
                 f"Hostname: {hostname}"
             )
 
